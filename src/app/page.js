@@ -3,12 +3,13 @@
 
 import { useState } from 'react';
 import PlayerCard from '@/components/PlayerCard';
+import SquadBuilder from '@/components/SquadBuilder'; // On importe le terrain
 import { players } from '@/data/players.js';
 
 export default function Home() {
   // --- États (Mémoire) ---
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("Tous"); // "Tous", "Attaquants", "Milieux", "Défenseurs"
+  const [activeFilter, setActiveFilter] = useState("Tous");
 
   // --- Configuration des positions ---
   const positionCategories = {
@@ -33,8 +34,6 @@ export default function Home() {
     // 2. Filtre Catégorie
     let matchesCategory = true;
     if (activeFilter !== "Tous") {
-      // On regarde si la position du joueur est dans la liste de la catégorie active
-      // On utilise ?. car positionCategories[activeFilter] peut être undefined si bug
       matchesCategory = positionCategories[activeFilter]?.includes(player.position);
     }
 
@@ -71,8 +70,8 @@ export default function Home() {
               onClick={() => setActiveFilter(category)}
               className={`px-6 py-2 rounded-full font-bold transition-all duration-300 transform hover:scale-105 ${
                 activeFilter === category 
-                  ? "bg-white text-slate-900 shadow-lg shadow-white/20" // Style Actif (Blanc)
-                  : "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700" // Style Inactif (Sombre)
+                  ? "bg-white text-slate-900 shadow-lg shadow-white/20" 
+                  : "bg-slate-800 text-slate-400 hover:bg-slate-700 border border-slate-700"
               }`}
             >
               {category}
@@ -80,6 +79,14 @@ export default function Home() {
           ))}
         </div>
       </header>
+
+      {/* --- LE SQUAD BUILDER (NOUVEAU) --- */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center text-white mb-6 uppercase tracking-widest border-b border-slate-800 pb-4 w-max mx-auto">
+          Constructeur d'équipe
+        </h2>
+        <SquadBuilder />
+      </section>
 
       {/* --- Grille des Résultats --- */}
       <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto transition-all duration-500">
@@ -96,7 +103,7 @@ export default function Home() {
       </div>
 
       <div className="mt-20 text-center border-t border-slate-800 pt-8 text-slate-600 text-sm">
-        Futia V1.1 - Projet Next.js
+        Futia V1.2 - Projet Next.js
       </div>
     </main>
   );
