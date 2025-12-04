@@ -1,39 +1,147 @@
 // src/data/players.js
 export const players = [
-    {
-      id: 1,
-      name: "Kylian Mbappé",
-      rating: 91,
-      position: "BU",
-      club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png", 
-      nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
-      image: "https://futbin.com/content/fifa25/img/players/231747.png?v=23", // On emprunte l'image pour le test
-      stats: { pac: 97, sho: 90, pas: 80, dri: 92, def: 36, phy: 78 },
-      meta_score: 9.9,
-      price: "3.2M"
-    },
-    {
-      id: 2,
-      name: "Erling Haaland",
-      rating: 91,
-      position: "BU",
-      club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-      nation_img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg",
-      image: "https://futbin.com/content/fifa25/img/players/239085.png?v=23",
-      stats: { pac: 89, sho: 93, pas: 66, dri: 80, def: 45, phy: 88 },
-      meta_score: 9.2,
-      price: "800K"
-    },
-    {
-      id: 3,
-      name: "Alexia Putellas",
-      rating: 90,
-      position: "MC",
-      club_img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-      nation_img: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
-      image: "https://futbin.com/content/fifa25/img/players/233746.png?v=23",
-      stats: { pac: 82, sho: 90, pas: 91, dri: 92, def: 72, phy: 78 },
-      meta_score: 9.5,
-      price: "1.1M"
-    }
-  ];
+  {
+    id: 1,
+    name: "Kylian Mbappé",
+    rating: 91,
+    position: "BU",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png", 
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
+    image: "https://futbin.com/content/fifa25/img/players/231747.png?v=23",
+    stats: { pac: 97, sho: 90, pas: 80, dri: 92, def: 36, phy: 78 },
+    meta_score: 9.9,
+    price: "3.2M"
+  },
+  {
+    id: 2,
+    name: "Erling Haaland",
+    rating: 91,
+    position: "BU",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg",
+    image: "https://futbin.com/content/fifa25/img/players/239085.png?v=23",
+    stats: { pac: 89, sho: 93, pas: 66, dri: 80, def: 45, phy: 88 },
+    meta_score: 9.2,
+    price: "800K"
+  },
+  {
+    id: 3,
+    name: "Aitana Bonmatí",
+    rating: 91,
+    position: "MC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
+    image: "https://futbin.com/content/fifa25/img/players/246420.png?v=23",
+    stats: { pac: 81, sho: 86, pas: 91, dri: 91, def: 75, phy: 78 },
+    meta_score: 9.6,
+    price: "950K"
+  },
+  {
+    id: 4,
+    name: "Vinícius Jr.",
+    rating: 90,
+    position: "AG",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg",
+    image: "https://futbin.com/content/fifa25/img/players/238794.png?v=23",
+    stats: { pac: 95, sho: 84, pas: 81, dri: 92, def: 29, phy: 68 },
+    meta_score: 9.7,
+    price: "1.4M"
+  },
+  {
+    id: 5,
+    name: "Jude Bellingham",
+    rating: 90,
+    position: "MOC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg",
+    image: "https://futbin.com/content/fifa25/img/players/252371.png?v=23",
+    stats: { pac: 80, sho: 85, pas: 87, dri: 89, def: 80, phy: 83 },
+    meta_score: 9.5,
+    price: "1.1M"
+  },
+  {
+    id: 6,
+    name: "Kevin De Bruyne",
+    rating: 90,
+    position: "MC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Belgium_%28civil%29.svg",
+    image: "https://futbin.com/content/fifa25/img/players/192985.png?v=23",
+    stats: { pac: 72, sho: 85, pas: 94, dri: 86, def: 63, phy: 72 },
+    meta_score: 8.8,
+    price: "60K"
+  },
+  {
+    id: 7,
+    name: "Virgil van Dijk",
+    rating: 89,
+    position: "DC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg",
+    image: "https://futbin.com/content/fifa25/img/players/203376.png?v=23",
+    stats: { pac: 78, sho: 60, pas: 71, dri: 72, def: 89, phy: 86 },
+    meta_score: 9.9,
+    price: "210K"
+  },
+  {
+    id: 8,
+    name: "Mohamed Salah",
+    rating: 89,
+    position: "AD",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg",
+    image: "https://futbin.com/content/fifa25/img/players/209331.png?v=23",
+    stats: { pac: 89, sho: 87, pas: 81, dri: 88, def: 45, phy: 76 },
+    meta_score: 9.1,
+    price: "180K"
+  },
+  {
+    id: 9,
+    name: "Rodri",
+    rating: 91,
+    position: "MDC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
+    image: "https://futbin.com/content/fifa25/img/players/231866.png?v=23",
+    stats: { pac: 66, sho: 80, pas: 86, dri: 78, def: 87, phy: 85 },
+    meta_score: 8.9,
+    price: "45K"
+  },
+  {
+    id: 10,
+    name: "Sophia Smith",
+    rating: 89,
+    position: "BU",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/a/a2/Portland_Thorns_FC_logo.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg",
+    image: "https://futbin.com/content/fifa25/img/players/260733.png?v=23",
+    stats: { pac: 93, sho: 85, pas: 79, dri: 88, def: 42, phy: 75 },
+    meta_score: 9.4,
+    price: "250K"
+  },
+  {
+    id: 11,
+    name: "Théo Hernández",
+    rating: 87,
+    position: "DG",
+    club_img: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
+    image: "https://futbin.com/content/fifa25/img/players/234509.png?v=23",
+    stats: { pac: 95, sho: 71, pas: 78, dri: 81, def: 79, phy: 84 },
+    meta_score: 9.8,
+    price: "110K"
+  },
+  {
+    id: 12,
+    name: "William Saliba",
+    rating: 87,
+    position: "DC",
+    club_img: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+    nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
+    image: "https://futbin.com/content/fifa25/img/players/243238.png?v=23",
+    stats: { pac: 82, sho: 40, pas: 70, dri: 72, def: 88, phy: 82 },
+    meta_score: 9.8,
+    price: "350K"
+  }
+];
