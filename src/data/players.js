@@ -1,16 +1,18 @@
 // src/data/players.js
 
+// Fonction qui passe par un proxy pour contourner le blocage Futbin
+const getFutbinImg = (id) => `https://wsrv.nl/?url=https://cdn.futbin.com/content/fifa25/img/players/${id}.png`;
+
 export const players = [
   {
-    id: 1,
+    id: 231747,
     name: "Kylian Mbappé",
     rating: 91,
     position: "BU",
-    // NOUVEAUX CHAMPS POUR LE COLLECTIF
+    image: getFutbinImg(231747),
     league: "LaLiga",
     club: "Real Madrid",
     nation: "France",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/231747.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
     price: "3.2M",
@@ -18,14 +20,14 @@ export const players = [
     detailedStats: { acceleration: 97, sprint_speed: 97, finishing: 94, shot_power: 90, stamina: 88, strength: 77 }
   },
   {
-    id: 2,
+    id: 239085,
     name: "Erling Haaland",
     rating: 91,
     position: "BU",
+    image: getFutbinImg(239085),
     league: "Premier League",
     club: "Manchester City",
     nation: "Norvège",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/239085.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg",
     price: "800K",
@@ -33,14 +35,14 @@ export const players = [
     detailedStats: { acceleration: 82, sprint_speed: 94, finishing: 96, shot_power: 94, stamina: 76, strength: 93 }
   },
   {
-    id: 3,
+    id: 246420, // ID Futbin pour Bonmatí
     name: "Aitana Bonmatí",
     rating: 91,
     position: "MC",
+    image: getFutbinImg(246420),
     league: "Liga F",
     club: "FC Barcelone",
     nation: "Espagne",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/246420.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
     price: "950K",
@@ -48,14 +50,14 @@ export const players = [
     detailedStats: { acceleration: 82, sprint_speed: 80, finishing: 88, shot_power: 84, stamina: 90, strength: 75 }
   },
   {
-    id: 4,
+    id: 238794,
     name: "Vinícius Jr.",
     rating: 90,
     position: "AG",
+    image: getFutbinImg(238794),
     league: "LaLiga",
     club: "Real Madrid",
     nation: "Brésil",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/238794.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg",
     price: "1.4M",
@@ -63,14 +65,14 @@ export const players = [
     detailedStats: { acceleration: 95, sprint_speed: 95, finishing: 89, shot_power: 85, stamina: 85, strength: 65 }
   },
   {
-    id: 5,
+    id: 252371,
     name: "Jude Bellingham",
     rating: 90,
     position: "MOC",
+    image: getFutbinImg(252371),
     league: "LaLiga",
     club: "Real Madrid",
     nation: "Angleterre",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/252371.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/b/be/Flag_of_England.svg",
     price: "1.1M",
@@ -78,14 +80,14 @@ export const players = [
     detailedStats: { acceleration: 80, sprint_speed: 80, finishing: 86, shot_power: 88, stamina: 96, strength: 84 }
   },
   {
-    id: 6,
+    id: 192985,
     name: "Kevin De Bruyne",
     rating: 90,
     position: "MC",
+    image: getFutbinImg(192985),
     league: "Premier League",
     club: "Manchester City",
     nation: "Belgique",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/192985.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Belgium_%28civil%29.svg",
     price: "60K",
@@ -93,14 +95,14 @@ export const players = [
     detailedStats: { acceleration: 73, sprint_speed: 71, finishing: 84, shot_power: 90, stamina: 80, strength: 74 }
   },
   {
-    id: 7,
+    id: 203376,
     name: "Virgil van Dijk",
     rating: 89,
     position: "DC",
+    image: getFutbinImg(203376),
     league: "Premier League",
     club: "Liverpool",
     nation: "Pays-Bas",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/203376.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg",
     price: "210K",
@@ -108,14 +110,14 @@ export const players = [
     detailedStats: { acceleration: 70, sprint_speed: 86, finishing: 60, shot_power: 81, stamina: 75, strength: 93 }
   },
   {
-    id: 8,
+    id: 192119,
     name: "Thibaut Courtois",
     rating: 89,
     position: "G",
+    image: getFutbinImg(192119),
     league: "LaLiga",
     club: "Real Madrid",
     nation: "Belgique",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/192119.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png",
     nation_img: "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Belgium_%28civil%29.svg",
     price: "30K",
@@ -123,14 +125,14 @@ export const players = [
     detailedStats: { acceleration: 40, sprint_speed: 45, reactions: 88, stamina: 40, strength: 70 }
   },
   {
-    id: 9,
+    id: 231866,
     name: "Rodri",
     rating: 91,
     position: "MDC",
+    image: getFutbinImg(231866),
     league: "Premier League",
     club: "Manchester City",
     nation: "Espagne",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/231866.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg",
     price: "45K",
@@ -138,14 +140,14 @@ export const players = [
     detailedStats: { acceleration: 64, sprint_speed: 68, finishing: 75, shot_power: 88, stamina: 92, strength: 86 }
   },
   {
-    id: 10,
+    id: 260733,
     name: "Sophia Smith",
     rating: 89,
     position: "BU",
+    image: getFutbinImg(260733),
     league: "NWSL",
     club: "Portland Thorns",
     nation: "États-Unis",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/260733.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/a/a2/Portland_Thorns_FC_logo.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg",
     price: "250K",
@@ -153,14 +155,14 @@ export const players = [
     detailedStats: { acceleration: 94, sprint_speed: 92, finishing: 89, shot_power: 84, stamina: 88, strength: 74 }
   },
   {
-    id: 11,
+    id: 234509,
     name: "Théo Hernández",
     rating: 87,
     position: "DG",
+    image: getFutbinImg(234509),
     league: "Serie A",
     club: "AC Milan",
     nation: "France",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/234509.png",
     club_img: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
     price: "110K",
@@ -168,14 +170,14 @@ export const players = [
     detailedStats: { acceleration: 96, sprint_speed: 95, finishing: 68, shot_power: 84, stamina: 90, strength: 82 }
   },
   {
-    id: 12,
+    id: 243238,
     name: "William Saliba",
     rating: 87,
     position: "DC",
+    image: getFutbinImg(243238),
     league: "Premier League",
     club: "Arsenal",
     nation: "France",
-    image: "https://cdn.futbin.com/content/fifa25/img/players/243238.png",
     club_img: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
     nation_img: "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg",
     price: "350K",

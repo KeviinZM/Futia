@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'wsrv.nl' }, // <-- INDISPENSABLE
+      { protocol: 'https', hostname: 'cdn.futbin.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
+    ],
+  },
 };
 
 export default nextConfig;
