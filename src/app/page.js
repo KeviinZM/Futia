@@ -2,8 +2,10 @@
 'use client'; 
 
 import { useState } from 'react';
+// IMPORT CRUCIAL : Pas d'accolades { } autour de PlayerCard ni de SquadBuilder !
 import PlayerCard from '@/components/PlayerCard';
-import SquadBuilder from '@/components/SquadBuilder'; // On importe le terrain
+import SquadBuilder from '@/components/SquadBuilder';
+// IMPORT AVEC ACCOLADES : Car dans players.js c'est "export const players"
 import { players } from '@/data/players.js';
 
 export default function Home() {
@@ -11,14 +13,14 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("Tous");
 
-  // --- Configuration des positions ---
+  // --- Configuration des positions pour le filtre ---
   const positionCategories = {
     "Attaquants": ["BU", "AG", "AD", "AT", "AVG", "AVD"],
     "Milieux": ["MC", "MOC", "MDC", "MG", "MD"],
     "Défenseurs": ["DC", "DG", "DD", "DLG", "DLD", "G"]
   };
 
-  // --- Fonction de normalisation (accents) ---
+  // --- Fonction pour nettoyer le texte (accents, majuscules) ---
   const normalizeText = (text) => {
     return text
       .normalize("NFD")
@@ -80,11 +82,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* --- LE SQUAD BUILDER (NOUVEAU) --- */}
+      {/* --- LE SQUAD BUILDER --- */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold text-center text-white mb-6 uppercase tracking-widest border-b border-slate-800 pb-4 w-max mx-auto">
           Constructeur d'équipe
         </h2>
+        {/* Le composant du terrain */}
         <SquadBuilder />
       </section>
 
