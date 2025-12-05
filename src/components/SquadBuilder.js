@@ -1,7 +1,7 @@
 // src/components/SquadBuilder.js
 'use client';
 
-import { useState, useMemo, useEffect } from 'react'; // Ajout de useEffect
+import { useState, useMemo, useEffect } from 'react';
 import { players } from '@/data/players';
 import { calculateMetaScore } from '@/utils/aiLogic'; 
 
@@ -24,31 +24,22 @@ export default function SquadBuilder() {
   const [squad, setSquad] = useState(initialSquad);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showAllPlayers, setShowAllPlayers] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false); // Pour éviter les flashs au chargement
+  const [modalSearch, setModalSearch] = useState(""); // NOUVEAU : Recherche dans la modale
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // --- SAUVEGARDE AUTOMATIQUE (NOUVEAU) ---
-
-  // 1. CHARGEMENT : Au lancement, on vérifie le localStorage
+  // --- SAUVEGARDE AUTOMATIQUE ---
   useEffect(() => {
     const savedSquad = localStorage.getItem('futia-squad-v1');
     if (savedSquad) {
-      try {
-        setSquad(JSON.parse(savedSquad));
-      } catch (e) {
-        console.error("Erreur de lecture de la sauvegarde", e);
-      }
+      try { setSquad(JSON.parse(savedSquad)); } catch (e) { console.error(e); }
     }
-    setIsLoaded(true); // On signale que le chargement est fini
+    setIsLoaded(true);
   }, []);
 
-  // 2. SAUVEGARDE : À chaque changement de 'squad', on écrit dans le localStorage
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('futia-squad-v1', JSON.stringify(squad));
-    }
+    if (isLoaded) localStorage.setItem('futia-squad-v1', JSON.stringify(squad));
   }, [squad, isLoaded]);
 
-  // 3. RESET : Fonction pour vider l'équipe
   const handleResetSquad = () => {
     if (confirm("Voulez-vous vraiment effacer votre équipe ?")) {
       setSquad(initialSquad);
@@ -56,8 +47,7 @@ export default function SquadBuilder() {
     }
   };
 
-
-  // --- LOGIQUE DE COMPATIBILITÉ DES POSTES ---
+  // --- LOGIQUE ---
   const positionMapping = {
     'G': ['G'],
     'DG': ['DG', 'DLG'],
@@ -71,7 +61,6 @@ export default function SquadBuilder() {
     'BU': ['BU', 'AT', 'AC']
   };
 
-  // --- OUTILS MATHÉMATIQUES ---
   const parsePrice = (priceStr) => {
     if (!priceStr) return 0;
     const clean = priceStr.toUpperCase().replace(/[^0-9.KM]/g, "");
@@ -96,21 +85,31 @@ export default function SquadBuilder() {
     const avgRat = count > 0 ? (activePlayers.reduce((sum, slot) => sum + slot.player.rating, 0) / count).toFixed(0) : 0;
     const avgMeta = count > 0 ? (activePlayers.reduce((sum, slot) => sum + parseFloat(calculateMetaScore(slot.player)), 0) / count).toFixed(1) : 0;
 
-    return {
-        totalPriceDisplay: formatPrice(totalRaw),
-        avgRating: avgRat,
-        avgMetaScore: avgMeta
-    };
+    return { totalPriceDisplay: formatPrice(totalRaw), avgRating: avgRat, avgMetaScore: avgMeta };
   }, [squad]);
 
+  // --- FILTRE AMÉLIORÉ (Poste + Recherche Texte) ---
   const availablePlayers = useMemo(() => {
     if (!selectedSlot) return [];
+    
     const currentSlotObj = squad.find(s => s.id === selectedSlot);
     if (!currentSlotObj) return [];
-    if (showAllPlayers) return players;
-    const allowedPositions = positionMapping[currentSlotObj.position] || [];
-    return players.filter(player => allowedPositions.includes(player.position));
-  }, [selectedSlot, showAllPlayers, squad]);
+
+    // 1. Filtrer par poste (sauf si "Voir tout")
+    let filtered = players;
+    if (!showAllPlayers) {
+        const allowedPositions = positionMapping[currentSlotObj.position] || [];
+        filtered = filtered.filter(player => allowedPositions.includes(player.position));
+    }
+
+    // 2. NOUVEAU : Filtrer par texte (si recherche)
+    if (modalSearch) {
+        const searchLower = modalSearch.toLowerCase();
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchLower));
+    }
+    
+    return filtered;
+  }, [selectedSlot, showAllPlayers, modalSearch, squad]); // Ajout de modalSearch aux dépendances
 
   const handlePlayerSelect = (player) => {
     const newSquad = squad.map((slot) => {
@@ -120,21 +119,23 @@ export default function SquadBuilder() {
       return slot;
     });
     setSquad(newSquad);
+    closeModal(); // On utilise une fonction pour fermer proprement
+  };
+
+  const closeModal = () => {
     setSelectedSlot(null);
+    setModalSearch(""); // On vide la recherche quand on ferme
     setShowAllPlayers(false);
   };
 
-  // Si pas encore chargé (côté serveur), on affiche un squelette pour éviter les bugs visuels
   if (!isLoaded) return <div className="h-[600px] w-full max-w-2xl mx-auto bg-green-900 rounded-xl animate-pulse"></div>;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
         
-      {/* TABLEAU DE BORD AVEC BOUTON RESET */}
+      {/* DASHBOARD */}
       <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 mb-6 shadow-xl text-white">
         <div className="flex justify-between items-center">
-            
-            {/* Stats */}
             <div className="flex w-full">
                 <div className="text-center w-1/3 border-r border-slate-700 px-2">
                     <p className="text-slate-400 text-[10px] uppercase font-bold mb-1">Prix</p>
@@ -152,16 +153,8 @@ export default function SquadBuilder() {
                     </div>
                 </div>
             </div>
-
-            {/* Bouton Reset (Corbeille) */}
-            <button 
-                onClick={handleResetSquad}
-                className="ml-4 p-2 bg-red-900/30 hover:bg-red-600 rounded-lg text-red-400 hover:text-white transition-colors"
-                title="Réinitialiser l'équipe"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+            <button onClick={handleResetSquad} className="ml-4 p-2 bg-red-900/30 hover:bg-red-600 rounded-lg text-red-400 hover:text-white transition-colors">
+                🗑️
             </button>
         </div>
       </div>
@@ -187,7 +180,6 @@ export default function SquadBuilder() {
                 <span className="text-slate-400 font-bold text-xl group-hover:text-yellow-400">+</span>
                 )}
             </div>
-            
             <div className="mt-1 bg-black/80 px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase truncate max-w-[80px]">
                 {slot.player ? slot.player.name : slot.position}
             </div>
@@ -195,27 +187,41 @@ export default function SquadBuilder() {
         ))}
       </div>
 
-      {/* MODALE */}
+      {/* MODALE AVEC RECHERCHE */}
       {selectedSlot && (
         <div className="absolute inset-0 z-50 bg-slate-900/95 backdrop-blur-sm rounded-xl p-4 flex flex-col animate-in fade-in zoom-in duration-200">
-            <div className="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
-                <div>
-                    <h3 className="text-xl font-bold text-white">
-                        <span className="text-yellow-400">{squad.find(s => s.id === selectedSlot)?.position}</span>
+            
+            {/* Header Modale */}
+            <div className="flex justify-between items-start mb-4 border-b border-slate-700 pb-2">
+                <div className="w-full mr-4">
+                    <h3 className="text-sm font-bold text-slate-400 mb-2">
+                        Poste : <span className="text-yellow-400 text-lg">{squad.find(s => s.id === selectedSlot)?.position}</span>
                     </h3>
-                    <label className="flex items-center gap-2 mt-1 text-xs text-slate-400 cursor-pointer">
+                    
+                    {/* BARRE DE RECHERCHE DANS LA MODALE */}
+                    <input 
+                        type="text" 
+                        placeholder="Chercher..." 
+                        autoFocus
+                        className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500"
+                        value={modalSearch}
+                        onChange={(e) => setModalSearch(e.target.value)}
+                    />
+                    
+                    <label className="flex items-center gap-2 mt-2 text-xs text-slate-400 cursor-pointer">
                         <input 
                             type="checkbox" 
                             checked={showAllPlayers}
                             onChange={(e) => setShowAllPlayers(e.target.checked)}
                             className="rounded border-slate-600 bg-slate-800 text-purple-600 focus:ring-purple-500"
                         />
-                        Voir tout
+                        Ignorer le poste
                     </label>
                 </div>
-                <button onClick={() => setSelectedSlot(null)} className="text-slate-400 hover:text-white px-3 py-1 bg-slate-800 rounded">Fermer</button>
+                <button onClick={closeModal} className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded">✕</button>
             </div>
 
+            {/* Liste filtrée */}
             <div className="overflow-y-auto flex-1 space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
                 {availablePlayers.length > 0 ? (
                     availablePlayers.map((player) => (
@@ -233,7 +239,10 @@ export default function SquadBuilder() {
                         </div>
                     ))
                 ) : (
-                    <div className="text-center text-slate-500 py-10"><p>Aucun joueur.</p></div>
+                    <div className="text-center text-slate-500 py-10">
+                        <p>Aucun joueur trouvé.</p>
+                        {modalSearch && <p className="text-xs mt-1">Essaie avec un autre nom.</p>}
+                    </div>
                 )}
             </div>
         </div>
