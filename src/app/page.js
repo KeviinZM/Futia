@@ -2,18 +2,18 @@
 'use client'; 
 
 import { useState } from 'react';
-// IMPORT CRUCIAL : Pas d'accolades { } autour de PlayerCard ni de SquadBuilder !
+// Imports des composants (sans accolades car ce sont des exports par défaut)
 import PlayerCard from '@/components/PlayerCard';
 import SquadBuilder from '@/components/SquadBuilder';
-// IMPORT AVEC ACCOLADES : Car dans players.js c'est "export const players"
-import { players } from '@/data/players.js';
+// Import des données (avec accolades car c'est un export nommé "export const")
+import { players } from '@/data/players';
 
 export default function Home() {
-  // --- États (Mémoire) ---
+  // --- États pour la recherche et les filtres ---
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("Tous");
 
-  // --- Configuration des positions pour le filtre ---
+  // --- Configuration des catégories pour les filtres ---
   const positionCategories = {
     "Attaquants": ["BU", "AG", "AD", "AT", "AVG", "AVD"],
     "Milieux": ["MC", "MOC", "MDC", "MG", "MD"],
@@ -28,14 +28,15 @@ export default function Home() {
       .toLowerCase();
   };
 
-  // --- Le Super Filtre (Texte + Catégorie) ---
+  // --- Filtrage de la liste des joueurs ---
   const filteredPlayers = players.filter((player) => {
-    // 1. Filtre Texte
+    // 1. Filtre par Nom
     const matchesSearch = normalizeText(player.name).includes(normalizeText(searchTerm));
     
-    // 2. Filtre Catégorie
+    // 2. Filtre par Catégorie (Poste)
     let matchesCategory = true;
     if (activeFilter !== "Tous") {
+      // On vérifie si le poste du joueur est dans la liste de la catégorie active
       matchesCategory = positionCategories[activeFilter]?.includes(player.position);
     }
 
@@ -44,6 +45,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0f172a] p-8 font-sans">
+      
+      {/* --- HEADER : Titre & Recherche --- */}
       <header className="mb-10 text-center flex flex-col items-center">
         <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2 tracking-tighter">
           FUTIA
@@ -52,19 +55,19 @@ export default function Home() {
           Base de données & Analyse IA (12 Joueurs)
         </p>
 
-        {/* --- Barre de Recherche --- */}
+        {/* Barre de Recherche Principale */}
         <div className="relative w-full max-w-md group mb-6">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
             <input 
               type="text" 
-              placeholder="Rechercher (ex: Saliba)..." 
+              placeholder="Rechercher un joueur (ex: Saliba)..." 
               className="relative w-full bg-slate-900 text-white border border-slate-700 rounded-lg py-4 px-6 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-slate-500 shadow-xl"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
         </div>
 
-        {/* --- Les Boutons de Filtres --- */}
+        {/* Boutons de Filtres */}
         <div className="flex flex-wrap justify-center gap-3">
           {["Tous", "Attaquants", "Milieux", "Défenseurs"].map((category) => (
             <button
@@ -82,31 +85,38 @@ export default function Home() {
         </div>
       </header>
 
-      {/* --- LE SQUAD BUILDER --- */}
+      {/* --- SECTION SQUAD BUILDER (Terrain + Coach) --- */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold text-center text-white mb-6 uppercase tracking-widest border-b border-slate-800 pb-4 w-max mx-auto">
           Constructeur d'équipe
         </h2>
-        {/* Le composant du terrain */}
+        {/* Le composant Terrain */}
         <SquadBuilder />
       </section>
 
-      {/* --- Grille des Résultats --- */}
-      <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto transition-all duration-500">
-        {filteredPlayers.length > 0 ? (
-          filteredPlayers.map((player) => (
-            <PlayerCard key={player.id} player={player} />
-          ))
-        ) : (
-          <div className="text-center text-slate-500 mt-10 animate-pulse">
-            <p className="text-2xl font-bold">Aucun joueur trouvé 😢</p>
-            <p className="text-md mt-2">Essaie de changer de filtre ou de recherche.</p>
-          </div>
-        )}
-      </div>
+      {/* --- SECTION GRILLE DES JOUEURS --- */}
+      <section>
+        <h2 className="text-2xl font-bold text-center text-slate-500 mb-8 uppercase tracking-wider">
+          Base de données ({filteredPlayers.length})
+        </h2>
+        
+        <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto transition-all duration-500">
+          {filteredPlayers.length > 0 ? (
+            filteredPlayers.map((player) => (
+              <PlayerCard key={player.id} player={player} />
+            ))
+          ) : (
+            <div className="text-center text-slate-500 mt-10 animate-pulse">
+              <p className="text-2xl font-bold">Aucun joueur trouvé 😢</p>
+              <p className="text-md mt-2">Essaie de changer de filtre ou de recherche.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
+      {/* Footer */}
       <div className="mt-20 text-center border-t border-slate-800 pt-8 text-slate-600 text-sm">
-        Futia V1.2 - Projet Next.js
+        Futia V1.4 - Projet Next.js
       </div>
     </main>
   );
