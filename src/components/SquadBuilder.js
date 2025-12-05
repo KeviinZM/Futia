@@ -1,9 +1,8 @@
 // src/components/SquadBuilder.js
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react'; // Ajout de useEffect
 import { players } from '@/data/players';
-// On importe l'algo qu'on a créé tout à l'heure pour calculer le score en direct
 import { calculateMetaScore } from '@/utils/aiLogic'; 
 
 export default function SquadBuilder() {
@@ -24,48 +23,95 @@ export default function SquadBuilder() {
 
   const [squad, setSquad] = useState(initialSquad);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [showAllPlayers, setShowAllPlayers] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false); // Pour éviter les flashs au chargement
+
+  // --- SAUVEGARDE AUTOMATIQUE (NOUVEAU) ---
+
+  // 1. CHARGEMENT : Au lancement, on vérifie le localStorage
+  useEffect(() => {
+    const savedSquad = localStorage.getItem('futia-squad-v1');
+    if (savedSquad) {
+      try {
+        setSquad(JSON.parse(savedSquad));
+      } catch (e) {
+        console.error("Erreur de lecture de la sauvegarde", e);
+      }
+    }
+    setIsLoaded(true); // On signale que le chargement est fini
+  }, []);
+
+  // 2. SAUVEGARDE : À chaque changement de 'squad', on écrit dans le localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('futia-squad-v1', JSON.stringify(squad));
+    }
+  }, [squad, isLoaded]);
+
+  // 3. RESET : Fonction pour vider l'équipe
+  const handleResetSquad = () => {
+    if (confirm("Voulez-vous vraiment effacer votre équipe ?")) {
+      setSquad(initialSquad);
+      localStorage.removeItem('futia-squad-v1');
+    }
+  };
+
+
+  // --- LOGIQUE DE COMPATIBILITÉ DES POSTES ---
+  const positionMapping = {
+    'G': ['G'],
+    'DG': ['DG', 'DLG'],
+    'DD': ['DD', 'DLD'],
+    'DC': ['DC'],
+    'MC': ['MC', 'MDC', 'MOC'],
+    'MDC': ['MDC', 'MC'],
+    'MOC': ['MOC', 'MC', 'AT'],
+    'AG': ['AG', 'AVG', 'MG'],
+    'AD': ['AD', 'AVD', 'MD'],
+    'BU': ['BU', 'AT', 'AC']
+  };
 
   // --- OUTILS MATHÉMATIQUES ---
-
-  // Transforme "3.2M" en 3200000
   const parsePrice = (priceStr) => {
     if (!priceStr) return 0;
-    const clean = priceStr.toUpperCase().replace(/[^0-9.KM]/g, ""); // Nettoie
+    const clean = priceStr.toUpperCase().replace(/[^0-9.KM]/g, "");
     let value = parseFloat(clean);
     if (priceStr.includes('M')) value *= 1000000;
     else if (priceStr.includes('K')) value *= 1000;
     return value;
   };
 
-  // Transforme 3200000 en "3.2M"
   const formatPrice = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
     return num.toString();
   };
 
-  // --- CALCULS DES STATS DE L'ÉQUIPE ---
-  
-  // On récupère uniquement les slots qui ont un vrai joueur
-  const activePlayers = squad.filter(slot => slot.player !== null);
-  const playerCount = activePlayers.length;
+  // --- CALCULS ---
+  const { totalPriceDisplay, avgRating, avgMetaScore } = useMemo(() => {
+    const activePlayers = squad.filter(slot => slot.player !== null);
+    const count = activePlayers.length;
 
-  // 1. Prix Total
-  const totalPriceRaw = activePlayers.reduce((total, slot) => total + parsePrice(slot.player.price), 0);
-  const totalPriceDisplay = formatPrice(totalPriceRaw);
+    const totalRaw = activePlayers.reduce((sum, slot) => sum + parsePrice(slot.player.price), 0);
+    const avgRat = count > 0 ? (activePlayers.reduce((sum, slot) => sum + slot.player.rating, 0) / count).toFixed(0) : 0;
+    const avgMeta = count > 0 ? (activePlayers.reduce((sum, slot) => sum + parseFloat(calculateMetaScore(slot.player)), 0) / count).toFixed(1) : 0;
 
-  // 2. Note Moyenne (Rating)
-  const avgRating = playerCount > 0 
-    ? (activePlayers.reduce((total, slot) => total + slot.player.rating, 0) / playerCount).toFixed(0) 
-    : 0;
+    return {
+        totalPriceDisplay: formatPrice(totalRaw),
+        avgRating: avgRat,
+        avgMetaScore: avgMeta
+    };
+  }, [squad]);
 
-  // 3. Meta Score Moyen (IA)
-  const avgMetaScore = playerCount > 0
-    ? (activePlayers.reduce((total, slot) => total + parseFloat(calculateMetaScore(slot.player)), 0) / playerCount).toFixed(1)
-    : 0;
+  const availablePlayers = useMemo(() => {
+    if (!selectedSlot) return [];
+    const currentSlotObj = squad.find(s => s.id === selectedSlot);
+    if (!currentSlotObj) return [];
+    if (showAllPlayers) return players;
+    const allowedPositions = positionMapping[currentSlotObj.position] || [];
+    return players.filter(player => allowedPositions.includes(player.position));
+  }, [selectedSlot, showAllPlayers, squad]);
 
-
-  // --- GESTION DU CLIC ---
   const handlePlayerSelect = (player) => {
     const newSquad = squad.map((slot) => {
       if (slot.id === selectedSlot) {
@@ -75,42 +121,52 @@ export default function SquadBuilder() {
     });
     setSquad(newSquad);
     setSelectedSlot(null);
+    setShowAllPlayers(false);
   };
+
+  // Si pas encore chargé (côté serveur), on affiche un squelette pour éviter les bugs visuels
+  if (!isLoaded) return <div className="h-[600px] w-full max-w-2xl mx-auto bg-green-900 rounded-xl animate-pulse"></div>;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
         
-      {/* --- NOUVEAU : LE TABLEAU DE BORD --- */}
-      <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 mb-6 shadow-xl flex justify-between items-center text-white">
-        
-        {/* Prix Total */}
-        <div className="text-center w-1/3 border-r border-slate-700">
-            <p className="text-slate-400 text-xs uppercase font-bold mb-1">Prix Est.</p>
-            <p className="text-2xl font-black text-yellow-400">{totalPriceDisplay}</p>
-        </div>
-
-        {/* Note Moyenne */}
-        <div className="text-center w-1/3 border-r border-slate-700">
-            <p className="text-slate-400 text-xs uppercase font-bold mb-1">Note Moy.</p>
-            <div className="flex justify-center items-baseline gap-1">
-                <span className="text-2xl font-black">{avgRating}</span>
-                <span className="text-slate-500 text-xs">/ 99</span>
+      {/* TABLEAU DE BORD AVEC BOUTON RESET */}
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 mb-6 shadow-xl text-white">
+        <div className="flex justify-between items-center">
+            
+            {/* Stats */}
+            <div className="flex w-full">
+                <div className="text-center w-1/3 border-r border-slate-700 px-2">
+                    <p className="text-slate-400 text-[10px] uppercase font-bold mb-1">Prix</p>
+                    <p className="text-xl font-black text-yellow-400">{totalPriceDisplay}</p>
+                </div>
+                <div className="text-center w-1/3 border-r border-slate-700 px-2">
+                    <p className="text-slate-400 text-[10px] uppercase font-bold mb-1">Note</p>
+                    <span className="text-xl font-black">{avgRating}</span>
+                </div>
+                <div className="text-center w-1/3 px-2">
+                    <p className="text-purple-400 text-[10px] uppercase font-bold mb-1">Meta</p>
+                    <div className="flex justify-center items-center gap-1">
+                        <span className="text-xl font-black">{avgMetaScore}</span>
+                        <span className={`w-2 h-2 rounded-full ${avgMetaScore >= 9 ? 'bg-green-500' : avgMetaScore >= 7 ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        {/* Score IA */}
-        <div className="text-center w-1/3">
-            <p className="text-purple-400 text-xs uppercase font-bold mb-1">Meta Score</p>
-            <div className="flex justify-center items-center gap-2">
-                <span className="text-2xl font-black text-white">{avgMetaScore}</span>
-                {/* Petite pastille de couleur selon la note */}
-                <span className={`w-3 h-3 rounded-full ${avgMetaScore >= 9 ? 'bg-green-500' : avgMetaScore >= 7 ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
-            </div>
+            {/* Bouton Reset (Corbeille) */}
+            <button 
+                onClick={handleResetSquad}
+                className="ml-4 p-2 bg-red-900/30 hover:bg-red-600 rounded-lg text-red-400 hover:text-white transition-colors"
+                title="Réinitialiser l'équipe"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
         </div>
-
       </div>
 
-      {/* --- LE TERRAIN (Inchangé visuellement) --- */}
+      {/* TERRAIN */}
       <div className="h-[600px] bg-green-800 rounded-xl border-4 border-white/20 shadow-2xl overflow-hidden relative">
         <div className="absolute top-0 left-0 right-0 h-px bg-white/30 top-1/2"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/30 rounded-full"></div>
@@ -139,41 +195,49 @@ export default function SquadBuilder() {
         ))}
       </div>
 
-      {/* --- LA MODALE (Inchangée) --- */}
+      {/* MODALE */}
       {selectedSlot && (
         <div className="absolute inset-0 z-50 bg-slate-900/95 backdrop-blur-sm rounded-xl p-4 flex flex-col animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
-                <h3 className="text-xl font-bold text-white">Sélectionner un joueur</h3>
-                <button 
-                    onClick={() => setSelectedSlot(null)}
-                    className="text-slate-400 hover:text-white"
-                >
-                    Fermer ✕
-                </button>
+                <div>
+                    <h3 className="text-xl font-bold text-white">
+                        <span className="text-yellow-400">{squad.find(s => s.id === selectedSlot)?.position}</span>
+                    </h3>
+                    <label className="flex items-center gap-2 mt-1 text-xs text-slate-400 cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            checked={showAllPlayers}
+                            onChange={(e) => setShowAllPlayers(e.target.checked)}
+                            className="rounded border-slate-600 bg-slate-800 text-purple-600 focus:ring-purple-500"
+                        />
+                        Voir tout
+                    </label>
+                </div>
+                <button onClick={() => setSelectedSlot(null)} className="text-slate-400 hover:text-white px-3 py-1 bg-slate-800 rounded">Fermer</button>
             </div>
 
             <div className="overflow-y-auto flex-1 space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
-                {players.map((player) => (
-                    <div 
-                        key={player.id}
-                        onClick={() => handlePlayerSelect(player)}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-900/30 border border-transparent hover:border-purple-500 cursor-pointer transition-all"
-                    >
-                        <img src={player.image} alt={player.name} className="w-10 h-10 object-contain bg-slate-800 rounded-md" />
-                        <div>
-                            <p className="font-bold text-white text-sm">{player.name}</p>
-                            <div className="flex gap-2 text-xs text-slate-400">
-                                <span className="text-yellow-400 font-bold">{player.rating}</span>
-                                <span>{player.position}</span>
-                                <span>{player.price}</span>
+                {availablePlayers.length > 0 ? (
+                    availablePlayers.map((player) => (
+                        <div key={player.id} onClick={() => handlePlayerSelect(player)} className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-900/30 border border-transparent hover:border-purple-500 cursor-pointer transition-all">
+                            <img src={player.image} alt={player.name} className="w-10 h-10 object-contain bg-slate-800 rounded-md" />
+                            <div className="flex-1">
+                                <p className="font-bold text-white text-sm">{player.name}</p>
+                                <div className="flex gap-2 text-xs text-slate-400">
+                                    <span className="text-yellow-400 font-bold">{player.rating}</span>
+                                    <span className="text-slate-300 font-semibold">{player.position}</span>
+                                    <span>{player.price}</span>
+                                </div>
                             </div>
+                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${parseFloat(calculateMetaScore(player)) >= 9 ? 'bg-green-900 text-green-300' : 'bg-slate-800 text-slate-400'}`}>{calculateMetaScore(player)}</span>
                         </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <div className="text-center text-slate-500 py-10"><p>Aucun joueur.</p></div>
+                )}
             </div>
         </div>
       )}
-
     </div>
   );
 }
