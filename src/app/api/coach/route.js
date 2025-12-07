@@ -14,7 +14,7 @@ export async function POST(req) {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
+
     // --- MISE À JOUR : Utilisation du modèle que tu as trouvé ---
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -42,8 +42,8 @@ export async function POST(req) {
 
   } catch (error) {
     console.error("❌ ERREUR GEMINI :", error);
-    return NextResponse.json({ 
-      error: `Erreur IA : ${error.message}` 
+    return NextResponse.json({
+      error: `Erreur IA : ${error.message}`
     }, { status: 500 });
   }
 }
