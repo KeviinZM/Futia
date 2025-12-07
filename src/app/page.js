@@ -21,6 +21,9 @@ export default function Home() {
   const [currentData, setCurrentData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedLeague, setSelectedLeague] = useState("All");
+  const [selectedClub, setSelectedClub] = useState("All");
+  const [selectedNation, setSelectedNation] = useState("All");
   const [visibleCount, setVisibleCount] = useState(50);
   const [loadingMessage, setLoadingMessage] = useState("Initializing...");
 
@@ -55,25 +58,58 @@ export default function Home() {
     setVisibleCount(prev => prev + 50);
   };
 
-  const filteredPlayers = useMemo(() => {
-    // Optimization: Don't filter if no search and "All" category (fast path)
-    if (!searchTerm && activeFilter === "All") return currentData;
+  // Derive unique options from data
+  const { leagues, clubs, nations } = useMemo(() => {
+    const uniqueLeagues = new Set();
+    const uniqueNations = new Set();
 
+    currentData.forEach(player => {
+      if (player.league) uniqueLeagues.add(player.league);
+      if (player.nation) uniqueNations.add(player.nation);
+    });
+
+    const uniqueClubs = new Set();
+    currentData.forEach(player => {
+      // If a league is selected, only show clubs from that league
+      if (selectedLeague === "All" || player.league === selectedLeague) {
+        if (player.club) uniqueClubs.add(player.club);
+      }
+    });
+
+    return {
+      leagues: Array.from(uniqueLeagues).sort(),
+      nations: Array.from(uniqueNations).sort(),
+      clubs: Array.from(uniqueClubs).sort()
+    };
+  }, [currentData, selectedLeague]);
+
+  // Reset club when league changes
+  useEffect(() => {
+    setSelectedClub("All");
+  }, [selectedLeague]);
+
+  const filteredPlayers = useMemo(() => {
     const normalizedSearch = normalizeText(searchTerm);
 
     return currentData.filter((player) => {
-      // Use pre-calculated normalized name if available, otherwise fallback
+      // 1. Search Filter
       const nameToCheck = player.nameNormalized || normalizeText(player.name);
-
       const matchesSearch = !normalizedSearch || nameToCheck.includes(normalizedSearch);
 
+      // 2. Position Filter
       let matchesCategory = true;
       if (activeFilter !== "All") {
         matchesCategory = positionCategories[activeFilter]?.includes(player.position);
       }
-      return matchesSearch && matchesCategory;
+
+      // 3. Dropdown Filters
+      const matchesLeague = selectedLeague === "All" || player.league === selectedLeague;
+      const matchesClub = selectedClub === "All" || player.club === selectedClub;
+      const matchesNation = selectedNation === "All" || player.nation === selectedNation;
+
+      return matchesSearch && matchesCategory && matchesLeague && matchesClub && matchesNation;
     });
-  }, [currentData, searchTerm, activeFilter]);
+  }, [currentData, searchTerm, activeFilter, selectedLeague, selectedClub, selectedNation]);
 
   const visiblePlayers = filteredPlayers.slice(0, visibleCount);
 
@@ -105,7 +141,40 @@ export default function Home() {
           />
         </div>
 
-        {/* Filters */}
+        {/* Dropdown Filters */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8 w-full max-w-4xl">
+          {/* League Select */}
+          <select
+            value={selectedLeague}
+            onChange={(e) => setSelectedLeague(e.target.value)}
+            className="bg-slate-800 text-white px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-purple-500 max-w-[200px]"
+          >
+            <option value="All">🌍 All Leagues</option>
+            {leagues.map(l => <option key={l} value={l}>{l}</option>)}
+          </select>
+
+          {/* Club Select */}
+          <select
+            value={selectedClub}
+            onChange={(e) => setSelectedClub(e.target.value)}
+            className="bg-slate-800 text-white px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-purple-500 max-w-[200px]"
+          >
+            <option value="All">🛡️ All Clubs</option>
+            {clubs.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+
+          {/* Nation Select */}
+          <select
+            value={selectedNation}
+            onChange={(e) => setSelectedNation(e.target.value)}
+            className="bg-slate-800 text-white px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-purple-500 max-w-[200px]"
+          >
+            <option value="All">🚩 All Nations</option>
+            {nations.map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </div>
+
+        {/* Position Filters */}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={() => setActiveFilter("All")}
