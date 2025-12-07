@@ -145,6 +145,9 @@ export const normalizePlayer = (row, index) => {
         playstyles: row['play style']
             ? row['play style'].replace(/[\[\]']/g, '').split(',').map(s => s.trim()).filter(s => s)
             : [],
+        altPositions: row['Alternative positions'] && row['Alternative positions'] !== "[]"
+            ? row['Alternative positions'].replace(/[\[\]']/g, '').split(',').map(s => s.trim()).filter(s => s)
+            : [],
         stats: stats,
         detailedStats: detailedStats,
         info: {

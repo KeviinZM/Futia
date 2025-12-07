@@ -90,13 +90,48 @@ export default function PlayerPage({ params }) {
             </div>
 
             <div className="w-full mt-4 space-y-2">
-              <div className="flex justify-between items-center bg-slate-950/50 p-4 rounded-xl border border-slate-800">
-                <span className="text-slate-400 font-bold uppercase text-sm">Rating</span>
-                <span className="text-3xl font-black text-yellow-400">{player.rating}</span>
-              </div>
+
               <div className="flex justify-between items-center bg-slate-950/50 p-4 rounded-xl border border-slate-800">
                 <span className="text-slate-400 font-bold uppercase text-sm">Price</span>
                 <span className="text-2xl font-black text-green-400">{player.price}</span>
+              </div>
+
+              {/* BIO INFO GRID */}
+              <div className="grid grid-cols-2 gap-2 w-full pt-4">
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Skills</span>
+                  <span className="text-yellow-400 font-bold text-sm">
+                    {'★'.repeat(player.info?.skillMoves || 0)}
+                  </span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">W. Foot</span>
+                  <span className="text-yellow-400 font-bold text-sm">
+                    {'★'.repeat(player.info?.weakFoot || 0)}
+                  </span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Foot</span>
+                  <span className="text-white font-bold text-sm">{player.info?.foot}</span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Age</span>
+                  <span className="text-white font-bold text-sm">{player.info?.age}</span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Height</span>
+                  <span className="text-white font-bold text-sm">{player.info?.height}</span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Weight</span>
+                  <span className="text-white font-bold text-sm">{player.info?.weight}</span>
+                </div>
+                <div className="bg-slate-950/50 p-2 rounded-lg border border-slate-800 text-center">
+                  <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Alt Pos</span>
+                  <span className="text-white font-bold text-sm">
+                    {player.altPositions && player.altPositions.length > 0 ? player.altPositions.join(', ') : '-'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -125,37 +160,7 @@ export default function PlayerPage({ params }) {
               </div>
             </div>
 
-            {/* BIO INFO ROW */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Skill Moves</span>
-                <span className="text-yellow-400 font-black text-lg">
-                  {'★'.repeat(player.info?.skillMoves || 0)} <span className="text-slate-600 text-xs">({player.info?.skillMoves})</span>
-                </span>
-              </div>
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Weak Foot</span>
-                <span className="text-yellow-400 font-black text-lg">
-                  {'★'.repeat(player.info?.weakFoot || 0)} <span className="text-slate-600 text-xs">({player.info?.weakFoot})</span>
-                </span>
-              </div>
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Foot</span>
-                <span className="text-white font-bold">{player.info?.foot}</span>
-              </div>
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Age</span>
-                <span className="text-white font-bold">{player.info?.age}</span>
-              </div>
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Height</span>
-                <span className="text-white font-bold">{player.info?.height}</span>
-              </div>
-              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
-                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Weight</span>
-                <span className="text-white font-bold">{player.info?.weight}</span>
-              </div>
-            </div>
+
 
             {/* Playstyles Section */}
             {player.playstyles && player.playstyles.length > 0 && (
@@ -187,17 +192,18 @@ export default function PlayerPage({ params }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Mapping categories: mapping standard names to the detailedStats keys */}
               {[
-                { label: "Pace", key: "pace", color: "text-blue-400", bar: "bg-blue-500" },
-                { label: "Shooting", key: "shooting", color: "text-green-400", bar: "bg-green-500" },
-                { label: "Passing", key: "passing", color: "text-orange-400", bar: "bg-orange-500" },
-                { label: "Dribbling", key: "dribbling", color: "text-purple-400", bar: "bg-purple-500" },
-                { label: "Defending", key: "defending", color: "text-red-400", bar: "bg-red-500" },
-                { label: "Physical", key: "physical", color: "text-yellow-400", bar: "bg-yellow-500" }
+                { label: "Pace", key: "pace", short: "PAC", statKey: "pac", color: "text-blue-400", bar: "bg-blue-500" },
+                { label: "Shooting", key: "shooting", short: "SHO", statKey: "sho", color: "text-green-400", bar: "bg-green-500" },
+                { label: "Passing", key: "passing", short: "PAS", statKey: "pas", color: "text-orange-400", bar: "bg-orange-500" },
+                { label: "Dribbling", key: "dribbling", short: "DRI", statKey: "dri", color: "text-purple-400", bar: "bg-purple-500" },
+                { label: "Defending", key: "defending", short: "DEF", statKey: "def", color: "text-red-400", bar: "bg-red-500" },
+                { label: "Physical", key: "physical", short: "PHY", statKey: "phy", color: "text-yellow-400", bar: "bg-yellow-500" }
               ].map((category) => (
                 <div key={category.key} className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
-                  <h4 className={`font-black uppercase tracking-widest mb-4 border-b border-slate-700 pb-2 ${category.color}`}>
-                    {category.label}
-                  </h4>
+                  <div className={`flex justify-between items-center mb-4 border-b border-slate-700 pb-2 ${category.color}`}>
+                    <h4 className="font-black uppercase tracking-widest">{category.label}</h4>
+                    <span className="text-xl font-bold">{player.stats[category.statKey]}</span>
+                  </div>
                   <div className="space-y-3">
                     {player.detailedStats && player.detailedStats[category.key] ? (
                       Object.entries(player.detailedStats[category.key]).map(([statName, statValue]) => (
