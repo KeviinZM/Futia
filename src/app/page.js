@@ -88,10 +88,12 @@ export default function Home() {
     setSelectedClub("All");
   }, [selectedLeague]);
 
+  const [sortBy, setSortBy] = useState("Rating");
+
   const filteredPlayers = useMemo(() => {
     const normalizedSearch = normalizeText(searchTerm);
 
-    return currentData.filter((player) => {
+    const filtered = currentData.filter((player) => {
       // 1. Search Filter
       const nameToCheck = player.nameNormalized || normalizeText(player.name);
       const matchesSearch = !normalizedSearch || nameToCheck.includes(normalizedSearch);
@@ -109,7 +111,16 @@ export default function Home() {
 
       return matchesSearch && matchesCategory && matchesLeague && matchesClub && matchesNation;
     });
-  }, [currentData, searchTerm, activeFilter, selectedLeague, selectedClub, selectedNation]);
+
+    // Sort Logic
+    return filtered.sort((a, b) => {
+      if (sortBy === "AI Score") {
+        return (parseFloat(b.meta_score) || 0) - (parseFloat(a.meta_score) || 0);
+      }
+      return (b.rating || 0) - (a.rating || 0); // Default Rating
+    });
+
+  }, [currentData, searchTerm, activeFilter, selectedLeague, selectedClub, selectedNation, sortBy]);
 
   const visiblePlayers = filteredPlayers.slice(0, visibleCount);
 
@@ -141,8 +152,24 @@ export default function Home() {
           />
         </div>
 
-        {/* Dropdown Filters */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8 w-full max-w-4xl">
+
+
+        {/* Sort & Filters */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8 w-full max-w-5xl">
+
+          {/* Sort By */}
+          <div className="flex items-center gap-2 bg-slate-800 px-4 py-3 rounded-lg border border-slate-700">
+            <span className="text-slate-400 font-bold uppercase text-xs">Sort By:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-transparent text-white font-bold focus:outline-none focus:text-purple-400"
+            >
+              <option value="Rating">⭐ Rating</option>
+              <option value="AI Score">🤖 AI Score</option>
+            </select>
+          </div>
+
           <select
             value={selectedLeague}
             onChange={(e) => setSelectedLeague(e.target.value)}
@@ -199,14 +226,16 @@ export default function Home() {
       </header>
 
       {/* --- SQUAD BUILDER SECTION --- */}
-      {currentData.length > 0 && (
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-white mb-6 uppercase tracking-widest border-b border-slate-800 pb-4 w-max mx-auto">
-            Squad Builder
-          </h2>
-          <SquadBuilder availablePlayersList={currentData} />
-        </section>
-      )}
+      {
+        currentData.length > 0 && (
+          <section className="mb-16">
+            <h2 className="text-3xl font-bold text-center text-white mb-6 uppercase tracking-widest border-b border-slate-800 pb-4 w-max mx-auto">
+              Squad Builder
+            </h2>
+            <SquadBuilder availablePlayersList={currentData} />
+          </section>
+        )
+      }
 
       {/* --- PLAYERS GRID --- */}
       <section>
@@ -241,6 +270,6 @@ export default function Home() {
       <div className="mt-20 text-center border-t border-slate-800 pt-8 text-slate-600 text-sm">
         Futia V2.0 - Full Database Version
       </div>
-    </main>
+    </main >
   );
 }
