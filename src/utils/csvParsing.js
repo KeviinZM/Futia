@@ -89,9 +89,11 @@ export const normalizePlayer = (row, index) => {
         games: safeInt(row['Games Played']),
         goals: safeInt(row.Goals),
         assists: safeInt(row.Assists),
-        image: row.ID
-            ? `https://cdn.sofifa.net/players/${row.ID.toString().padStart(3, '0').slice(0, 3)}/${row.ID.toString().padStart(3, '0').slice(3)}/25_120.png`
-            : `https://cdn.sofifa.net/players/${id.toString().padStart(3, '0').slice(0, 3)}/${id.toString().padStart(3, '0').slice(3)}/25_120.png`,
+        image: row.card
+            ? row.card
+            : (row.ID
+                ? `https://cdn.sofifa.net/players/${row.ID.toString().padStart(3, '0').slice(0, 3)}/${row.ID.toString().padStart(3, '0').slice(3)}/25_120.png`
+                : `https://cdn.sofifa.net/players/${id.toString().padStart(3, '0').slice(0, 3)}/${id.toString().padStart(3, '0').slice(3)}/25_120.png`),
         nation_img: "https://cdn.sofifa.net/flags/fr.png",
         club_img: "https://cdn.sofifa.net/teams/beta/light/73.png",
         stats: stats,
