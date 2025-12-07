@@ -70,6 +70,50 @@ export const normalizePlayer = (row, index) => {
         phy: safeInt(row.PHY || row.Physique || row.Physical)
     };
 
+    const detailedStats = {
+        pace: {
+            "Acceleration": safeInt(row.Acceleration),
+            "Sprint Speed": safeInt(row['Sprint Speed'])
+        },
+        shooting: {
+            "Positioning": safeInt(row.Positioning),
+            "Finishing": safeInt(row.Finishing),
+            "Shot Power": safeInt(row['Shot Power']),
+            "Long Shots": safeInt(row['Long Shots']),
+            "Volleys": safeInt(row.Volleys),
+            "Penalties": safeInt(row.Penalties)
+        },
+        passing: {
+            "Vision": safeInt(row.Vision),
+            "Crossing": safeInt(row.Crossing),
+            "FK Accuracy": safeInt(row['Free Kick Accuracy']),
+            "Short Passing": safeInt(row['Short Passing']),
+            "Long Passing": safeInt(row['Long Passing']),
+            "Curve": safeInt(row.Curve)
+        },
+        dribbling: {
+            "Agility": safeInt(row.Agility),
+            "Balance": safeInt(row.Balance),
+            "Reactions": safeInt(row.Reactions),
+            "Ball Control": safeInt(row['Ball Control']),
+            "Dribbling": safeInt(row.Dribbling),
+            "Composure": safeInt(row.Composure)
+        },
+        defending: {
+            "Interceptions": safeInt(row.Interceptions),
+            "Heading Acc.": safeInt(row['Heading Accuracy']),
+            "Def. Awareness": safeInt(row['Def Awareness']),
+            "Stand Tackle": safeInt(row['Standing Tackle']),
+            "Slide Tackle": safeInt(row['Sliding Tackle'])
+        },
+        physical: {
+            "Jumping": safeInt(row.Jumping),
+            "Stamina": safeInt(row.Stamina),
+            "Strength": safeInt(row.Strength),
+            "Aggression": safeInt(row.Aggression)
+        }
+    };
+
     const id = row.ID || row.Id || index;
     const name = row.Name || row.Nom || "Inconnu";
 
@@ -98,7 +142,19 @@ export const normalizePlayer = (row, index) => {
                 : `https://cdn.sofifa.net/players/${id.toString().padStart(3, '0').slice(0, 3)}/${id.toString().padStart(3, '0').slice(3)}/25_120.png`),
         nation_img: getNationFlag(row.Nation || row.Country),
         club_img: getClubLogo(row.Team || row.Club),
+        playstyles: row['play style']
+            ? row['play style'].replace(/[\[\]']/g, '').split(',').map(s => s.trim()).filter(s => s)
+            : [],
         stats: stats,
+        detailedStats: detailedStats,
+        info: {
+            weakFoot: safeInt(row['Weak foot']),
+            skillMoves: safeInt(row['Skill moves']),
+            foot: row['Preferred foot'] || "Right",
+            height: row.Height,
+            weight: row.Weight,
+            age: safeInt(row.Age)
+        },
         meta_score: null, // Will be calculated below
         isOwned: !!row['Bought For'] || !!row['Games Played']
     };

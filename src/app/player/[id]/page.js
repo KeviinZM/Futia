@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { calculateMetaScore } from '@/utils/aiLogic';
 import PlayerRadar from '@/components/PlayerRadar';
@@ -25,8 +25,8 @@ export default function PlayerPage({ params }) {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Load full DB - cached by browser mostly
-        const rawData = await parseCSV('/data/EAFC26.csv');
+        // Load full DB - cached by browser mostly (force reload with timestamp)
+        const rawData = await parseCSV(`/data/EAFC26.csv?v=${Date.now()}`);
         const players = rawData.map((row, index) => normalizePlayer(row, index));
 
         const found = players.find((p) => p.id.toString() === unwrappedParams.id);
@@ -125,24 +125,100 @@ export default function PlayerPage({ params }) {
               </div>
             </div>
 
+            {/* BIO INFO ROW */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Skill Moves</span>
+                <span className="text-yellow-400 font-black text-lg">
+                  {'★'.repeat(player.info?.skillMoves || 0)} <span className="text-slate-600 text-xs">({player.info?.skillMoves})</span>
+                </span>
+              </div>
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Weak Foot</span>
+                <span className="text-yellow-400 font-black text-lg">
+                  {'★'.repeat(player.info?.weakFoot || 0)} <span className="text-slate-600 text-xs">({player.info?.weakFoot})</span>
+                </span>
+              </div>
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Foot</span>
+                <span className="text-white font-bold">{player.info?.foot}</span>
+              </div>
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Age</span>
+                <span className="text-white font-bold">{player.info?.age}</span>
+              </div>
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Height</span>
+                <span className="text-white font-bold">{player.info?.height}</span>
+              </div>
+              <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-center">
+                <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Weight</span>
+                <span className="text-white font-bold">{player.info?.weight}</span>
+              </div>
+            </div>
+
+            {/* Playstyles Section */}
+            {player.playstyles && player.playstyles.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold mb-4 text-white border-l-4 border-purple-500 pl-4">Playstyles</h3>
+                <div className="flex flex-wrap gap-3">
+                  {player.playstyles.map((style, index) => {
+                    const isPlus = style.includes('+');
+                    return (
+                      <span
+                        key={index}
+                        className={`px-4 py-2 rounded-full text-sm font-bold shadow-sm transition-transform hover:scale-105 ${isPlus
+                          ? "bg-yellow-500/20 text-yellow-300 border border-yellow-500/50 shadow-[0_0_10px_-2px_rgba(234,179,8,0.3)]"
+                          : "bg-slate-800 text-slate-300 border border-slate-600"
+                          }`}
+                      >
+                        {style}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <h3 className="text-xl font-bold mb-6 text-white border-l-4 border-purple-500 pl-4">Detailed Stats</h3>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {Object.entries(player.stats).map(([key, value]) => (
-                <div key={key} className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800 transition-colors group">
-                  <div className="flex justify-between items-end mb-2">
-                    <span className="text-slate-500 font-bold uppercase text-[10px] tracking-wider group-hover:text-slate-300 transition-colors">{key}</span>
-                    <span className={`text-lg font-black ${value >= 90 ? 'text-green-400' : value >= 80 ? 'text-green-200' : 'text-slate-200'}`}>
-                      {value}
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-700/50 h-1.5 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${value >= 90 ? 'bg-green-500' : value >= 80 ? 'bg-green-300' : 'bg-yellow-500'}`} style={{ width: `${value}%` }}></div>
+            {/* Detailed Stats Groups */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Mapping categories: mapping standard names to the detailedStats keys */}
+              {[
+                { label: "Pace", key: "pace", color: "text-blue-400", bar: "bg-blue-500" },
+                { label: "Shooting", key: "shooting", color: "text-green-400", bar: "bg-green-500" },
+                { label: "Passing", key: "passing", color: "text-orange-400", bar: "bg-orange-500" },
+                { label: "Dribbling", key: "dribbling", color: "text-purple-400", bar: "bg-purple-500" },
+                { label: "Defending", key: "defending", color: "text-red-400", bar: "bg-red-500" },
+                { label: "Physical", key: "physical", color: "text-yellow-400", bar: "bg-yellow-500" }
+              ].map((category) => (
+                <div key={category.key} className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
+                  <h4 className={`font-black uppercase tracking-widest mb-4 border-b border-slate-700 pb-2 ${category.color}`}>
+                    {category.label}
+                  </h4>
+                  <div className="space-y-3">
+                    {player.detailedStats && player.detailedStats[category.key] ? (
+                      Object.entries(player.detailedStats[category.key]).map(([statName, statValue]) => (
+                        <div key={statName} className="flex flex-col">
+                          <div className="flex justify-between items-end mb-1">
+                            <span className="text-slate-400 text-xs font-bold uppercase">{statName}</span>
+                            <span className={`text-sm font-bold ${statValue >= 90 ? 'text-green-400' : statValue >= 80 ? 'text-green-200' : 'text-white'}`}>{statValue}</span>
+                          </div>
+                          <div className="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${category.bar} opacity-80`} style={{ width: `${statValue}%` }}></div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-500 text-xs">No detailed data</p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
+
 
             <div className="mt-8 pt-6 border-t border-slate-800 text-slate-500 text-sm">
               <p>Games: {player.games} | Goals: {player.goals} | Assists: {player.assists}</p>
