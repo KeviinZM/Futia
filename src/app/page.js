@@ -130,12 +130,12 @@ export default function Home() {
         )}
 
         {/* Search Bar */}
-        <div className="relative w-full max-w-md group mb-6">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+        <div className="relative w-full max-w-md group mb-6 z-10">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 pointer-events-none"></div>
           <input
             type="text"
             placeholder="Search player..."
-            className="relative w-full bg-slate-900 text-white border border-slate-700 rounded-lg py-4 px-6 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-slate-500 shadow-xl"
+            className="relative w-full bg-slate-900 text-white border border-slate-700 rounded-lg py-4 px-6 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-slate-500 shadow-xl z-20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -143,7 +143,6 @@ export default function Home() {
 
         {/* Dropdown Filters */}
         <div className="flex flex-wrap justify-center gap-4 mb-8 w-full max-w-4xl">
-          {/* League Select */}
           <select
             value={selectedLeague}
             onChange={(e) => setSelectedLeague(e.target.value)}
@@ -153,7 +152,6 @@ export default function Home() {
             {leagues.map(l => <option key={l} value={l}>{l}</option>)}
           </select>
 
-          {/* Club Select */}
           <select
             value={selectedClub}
             onChange={(e) => setSelectedClub(e.target.value)}
@@ -163,7 +161,6 @@ export default function Home() {
             {clubs.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
 
-          {/* Nation Select */}
           <select
             value={selectedNation}
             onChange={(e) => setSelectedNation(e.target.value)}
