@@ -1,5 +1,7 @@
 import Papa from 'papaparse';
 import { calculateMetaScore } from './aiLogic';
+import { getNationFlag } from './nationData';
+import { getClubLogo } from './clubData';
 
 const positionMap = {
     // French to English
@@ -94,8 +96,8 @@ export const normalizePlayer = (row, index) => {
             : (row.ID
                 ? `https://cdn.sofifa.net/players/${row.ID.toString().padStart(3, '0').slice(0, 3)}/${row.ID.toString().padStart(3, '0').slice(3)}/25_120.png`
                 : `https://cdn.sofifa.net/players/${id.toString().padStart(3, '0').slice(0, 3)}/${id.toString().padStart(3, '0').slice(3)}/25_120.png`),
-        nation_img: "https://cdn.sofifa.net/flags/fr.png",
-        club_img: "https://cdn.sofifa.net/teams/beta/light/73.png",
+        nation_img: getNationFlag(row.Nation || row.Country),
+        club_img: getClubLogo(row.Team || row.Club),
         stats: stats,
         meta_score: null, // Will be calculated below
         isOwned: !!row['Bought For'] || !!row['Games Played']
